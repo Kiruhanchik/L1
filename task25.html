@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p onclick="element();">Создать элемент</p>
+    <script>
+        const element = () => {
+            const elem = prompt('Какой элемент вы хотите создать?', 'p');
+            const content = prompt('Хорошо, а какой контент будет внутри элемента?', ''); // получаем инфу об элементы от пользователя
+            const style = prompt('Напишите стили элемента и их параметры через запятую', '');
+            const element = document.createElement(`${elem}`); // создаем элемент
+            element.innerHTML = `${content}`;
+            document.body.append(element); // помещаю в DOM
+            element.setAttribute('style', `${style}`); // стилизую
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p id="clicker" onclick="templateInfo()">Click this!</p>
+    <template id="template">
+        <div id="anketa">
+            <p id="name"></p>  
+            <p id="surname"></p>
+            <p id="age"></p>
+        </div>
+    </template>
+    <script>
+        const templateInfo = () => {
+            if ("content" in document.createElement("template")) {  //проверяю поддержку темплейтов в браузере
+                const name = prompt('Write your name', '');  // получаю данные пользователя
+                const surname = prompt('Write your surname', '');
+                const age = prompt('Write your age', '');
+                const template = document.getElementById('template'); 
+                let clone = template.content.cloneNode(true); // делаю клонирование
+                let anketa = clone.querySelector("#anketa"); // родительский блок-анкета
+                let params = clone.querySelector("#anketa").querySelectorAll('p'); // параметры пользователя
+                anketa.style.border = "1px solid black"; 
+                params[0].textContent = 'Your name: ' + name; // заполняем и стилизуем их
+                params[1].textContent = 'Your surname: ' + surname;
+                params[2].textContent = 'Your age: ' + age;
+                document.body.appendChild(clone); // вставляем сделанный клон в DOM
+            } else {
+                alert('Your brouser doesn`t support HTML templates'); // иначе вывожу предупреждение
+            }
+        }
+    </script>
+    <style>
+        #clicker {
+            font-size: 150%;
+            color:rgb(172, 31, 31);
+            font-weight: 900;
+        }
+    </style>
+</body>
+</html>

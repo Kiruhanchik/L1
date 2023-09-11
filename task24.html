@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table id="data-table" >
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">fname</th>
+                <th onclick="sortTable(1)">lname</th>
+                <th onclick="sortTable(2)">tel</th>
+                <th onclick="sortTable(3)">address</th>
+                <th onclick="sortTable(4)">city</th>
+                <th onclick="sortTable(5)">state</th>  
+                <th onclick="sortTable(6)">zip</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="pagination"></div>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {  // после загрузки дома запускаем функцию запроса к данным
+            fetchData();
+        });
+
+        const fetchData = async () => {
+            let data = await fetch('http://www.filltext.com/?rows=1000&fname=%7BfirstName%7D&lname=%7BlastName%7D&tel=%7Bphone%7Cformat%7D&address=%7BstreetAddress%7D&city=%7Bcity%7D&state=%7BusState%7Cabbr%7D&zip=%7Bzip%7D&pretty=true')
+            .then((res) => { return res.json() }).catch((err) => { throw(err) });  // кидаем запрос и получаем json
+            const tbody = document.querySelector('#data-table tbody');      
+            tbody.innerHTML = '';
+            data.forEach(function(item) {                  // вставляем инфу каждого айтема в ряды таблицы
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.fname}</td>
+                    <td>${item.lname}</td>
+                    <td>${item.tel}</td>
+                    <td>${item.address}</td>
+                    <td>${item.city}</td>
+                    <td>${item.state}</td>
+                    <td>${item.zip}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function sortTable(columnIndex) {
+            const table = document.getElementById('data-table');
+            const rows = Array.from(table.getElementsByTagName('tr')).slice(1); // сортируем все, кроме элементов первого ряда заголовков
+
+            let sortMultiplier = 1; // по-умолчанию сортируем по-возрастанию
+
+            if (table.dataset.sortColumn === columnIndex.toString()) {
+                sortMultiplier = table.dataset.sortMultiplier === '1' ? -1 : 1; // ставим обратную сортирвку той, что была до этого
+            }
+
+            rows.sort(function(rowA, rowB) {
+                const cellA = rowA.getElementsByTagName('td')[columnIndex];  // сортруем столбцы
+                const cellB = rowB.getElementsByTagName('td')[columnIndex];
+
+                const valueA = cellA ? cellA.innerHTML.trim() : '';
+                const valueB = cellB ? cellB.innerHTML.trim() : '';
+
+                return sortMultiplier * valueA.localeCompare(valueB, undefined, { numeric: true }); // сравниваем строки
+            });
+
+            rows.forEach(function(row) {
+                table.appendChild(row);
+            });
+
+            table.dataset.sortColumn = columnIndex; // какой столбец сортируем
+            table.dataset.sortMultiplier = sortMultiplier; // записываем какая была прошлая сортировка, чтобы потом поменять
+        }       // работает это так, что мы нажимаем на заголовок столбца и срабатывает событие сортировки для столбца
+    </script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</body>
+</html>

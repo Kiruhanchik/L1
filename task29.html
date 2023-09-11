@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="display: flex; justify-content: center;">
+    <form action="" id="my-form" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <input id="name" type="text" placeholder="Your name">
+        <input id="age" type="text" placeholder="Your age">
+        <input id="skill" type="text" placeholder="Your skill">
+        <button id="send">send</button>
+    </form>
+    <script>
+        const sendForm = () => {
+            const form = document.getElementById('my-form');
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const skill = document.getElementById('skill').value;
+            const formData = [name, age, skill]; // массив данных пользователя
+            let okay = confirm(`Is your info right? \n Your name: ${name} \n Your age: ${age} \n Your skill: ${skill}`); // ожидаю подтверждения
+
+            if (okay) { // если пользователь согласен
+                alert('thank you!');
+                fetch('your_url', {  // посылаю пост запрос на какой то сервер с телом введенных данных
+                    method: 'POST', // означает, что я отправляю данные на сервер в запросе
+                    body: formData,
+                })
+                .then((response) => {
+                    console.log(response); // обработка ответа сервака 
+                })
+                .catch((error) => {
+                    console.error(error); // обработка ошибки
+                });
+            } else { // если не согласен
+                alert('please, correct your info');
+            }
+        }
+
+        document.getElementById('send').addEventListener('click', sendForm);
+    </script>
+    <style>
+        input {
+            margin-bottom: 5%;
+            border: 0.5px solid black;
+        }
+        button {
+            width: 100%;
+            transition: 0.3s;
+            border: 0.5px solid black;
+        }
+        button:hover {
+            background-color: darkkhaki;
+        }
+    </style>
+</body>
+</html>

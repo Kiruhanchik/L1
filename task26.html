@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 onclick="recursionDOM(document.body)">kookok</h1>
+    <p>dfefe</p>
+    <p>ee</p>
+    <p>fff</p>
+    <p>33222</p>
+    <script>
+        const recursionDOM = (element) => {
+            console.log(element.tagName + '\n'); 
+            const childElements = element.querySelectorAll('*');
+            childElements.forEach((element) => {
+                recursionDOM(element); // выполняю для каждого элмента мою функцию 
+            });
+        }
+    </script>
+</body>
+</html>

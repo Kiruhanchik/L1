@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VK API</title>
+    <style>
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body style="display: flex; justify-content: center;">
+    <div id="widget" style="width: 500px; height: 600px; border: 2px solid black;">
+        <div id="widget-content" style="overflow-y: scroll; width: 500px; height: 600px"></div>
+    <script type="text/javascript">
+        const vkApiUrl = 'https://api.vk.com/method/';
+        const groupId = '11982368'; // ID целевой группы VK
+        const pageSize = 10; // Количество постов, загружаемых за один запрос
+        const maxLocalStorageSize = 1024 * 1024; // Максимальный размер localStorage
+        const domain = 'https://vk.com/forbes'; // домен нужного паблика
+        const filter = 'all';
+        let cachedPosts = []; // кеш постов
+        let currentPage = 0; // Текущая страница
+        let isLoading = false; // Флаг загрузки данных
+
+        function loadPosts() {
+            isLoading = true;
+            let script = document.createElement('script');
+            script.src = `${vkApiUrl}wall.get?owner_id=-${groupId}&access_token=73ecb74773ecb74773ecb747f970f931b0773ec73ecb747171aa4b26c98759403979466&domain=${domain}&count=${pageSize}&filter=${filter}&v=5.131&offset=${currentPage * pageSize}&callback=callbackFunc`;
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }
+
+        function callbackFunc(result) {  
+            const container = document.getElementById('widget-content'); // так как на сервере vk стоит КОРС, то надо использовать JSONP
+            const posts = result.response.items;                         // пишем колбек-функцию, которая возвращает нам посты          
+            if (posts.length === 0) {
+                window.removeEventListener('scroll', handleScroll);
+                return;
+            }
+
+            for (let i = 0; i < posts.length; i++) { // тут создаем узлы с постами в DOM
+                const post = document.createElement('p');
+                post.textContent = '• ' + posts[i].text;
+                container.appendChild(post);
+                cachedPosts.push(posts[i].text); // добывляем в массив кеша новый пост
+            }
+
+            // Проверяем размер localStorage и вытесняем старые записи при необходимости
+            while (JSON.stringify(cachedPosts).length > maxLocalStorageSize) {
+                cachedPosts.shift(); // удаляю первый элемент массива 
+            }
+
+            // Сохраняем обновленные данные в localStorage
+            localStorage.setItem('cachedPosts', JSON.stringify(cachedPosts)); // добавляем в локалстор
+
+            isLoading = false;
+            currentPage++; // изменяем значение текущей страницы
+        }
+
+        // Проверяем наличие кэшированных данных в localStorage и загружаем их, если они есть
+        const cachedPostsJson = localStorage.getItem('cachedPosts');
+        if (cachedPostsJson) {
+            cachedPosts = JSON.parse(cachedPostsJson);
+
+            // Восстанавливаем ранее загруженные данные
+            const container = document.getElementById('widget-content');
+            for (let i = 0; i < cachedPosts.length; i++) {
+                const post = document.createElement('p');
+                post.textContent = '• ' + cachedPosts[i];
+                container.appendChild(post);
+            }
+        }
+
+        function handleScroll() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) { // проверка доскролливания 
+                if (!isLoading) { 
+                    loadPosts(); // подгружаю посты
+                }
+            }
+        }
+
+        document.getElementById('widget-content').addEventListener('scroll', handleScroll); // добавляю слушатель скролла
+
+        // Загрузка первой порции постов
+        loadPosts();
+    </script>
+</body>
+</html>

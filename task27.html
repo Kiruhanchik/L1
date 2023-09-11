@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello, world!</h1>
+    <h2>How are you?</h2>
+    <script>
+        document.addEventListener('click', (el) => {
+            let timer = setInterval(() => {
+                el.target.style.color = 'red'; // я нажимаю на элемент и для него запускается процесс смены цвета
+            }, 1000);
+            let timer2 = setInterval(() => {
+                el.target.style.color = 'black'; // обратно в черный цвет
+            }, 1500);
+        })
+    </script>
+</body>
+</html>

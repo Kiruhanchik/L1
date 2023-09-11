@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=a16d59ac-0d22-4dfd-a20a-1c37f3afcb87&lang=ru_RU" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://api-maps.yandex.ru/2.1.77/layout/default#"> 
+    <title>Document</title>
+</head>
+<body>
+    <input id="client-adress" type="text" placeholder="Введите адрес">
+    <select name="result-adress" id="result-adress"></select>
+    <div id="map" style="width: 300px; height: 200px; margin-top: 5%;"></div>
+</body>
+<script>
+    window.onload = function() {
+        let addressInput = document.getElementById('client-adress');
+        let addressList = document.getElementById('result-adress');
+
+        ymaps.ready(function () {
+            var myMap = new ymaps.Map("map", {  // создаю обьект с картой яндекса когда вызываю метод ready
+                center: [55.76, 37.64],
+                zoom: 10
+            });
+        });
+
+        addressInput.addEventListener('input', function() {
+            let address = addressInput.value;
+            if (address.trim() !== '') { // если внутри инпута не пусто
+                addressList.innerText = '';
+                ymaps.geocode(address, {  // вызываю геокод с 5 результатами значения переменной address
+                    results: 5,
+                }).then(function(res) {                                // после промиса с полученным результатом создаю значения в списке
+                    let addresses =  res.geoObjects.getIterator();
+                    for (let i = 0; i < addresses.getLength(); i++) {
+                        let address = addresses.get(i);
+                        var option = document.createElement('option');
+                        option.value = address.getAddressLine();
+                        option.text = address.getAddressLine();
+                        addressList.appendChild(option);
+                    }
+                    addressList.style.display = 'block';
+                });
+            } else {
+                addressList.style.display = 'none'; // иначе скрываю
+            }
+        })
+        
+        addressList.addEventListener('change', function() {  // добавляю слушатель изменения инпута
+            addressInput.value = addressList.value;
+            addressList.style.display = 'none';
+        });
+    };
+</script>
+</html>
